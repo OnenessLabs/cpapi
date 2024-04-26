@@ -1,0 +1,7 @@
+.env
+.vercel
+node_modules
+pkg
+cp-api-deployment.yaml
+cp-api-ingress.yaml
+cp-api-service.yaml
