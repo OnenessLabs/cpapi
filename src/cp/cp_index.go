@@ -112,6 +112,7 @@ func AirdropCPToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	amountWei := ToWei(amount, 18)
+	log.Printf("amount:%s", amountWei)
 	mintTx, err := targetInstance.Mint(auth, toAddress, amountWei)
 	if err != nil {
 		log.Printf("mint error: %s\n", err)
@@ -145,7 +146,8 @@ func getReceiptByTxhash(txhash string, is721 bool) TxStatus {
 
 	targetClient, err := ethclient.Dial(rpcEndpoint)
 	if err != nil {
-		log.Println(err)
+		log.Printf("dial: %s\n", err)
+		ret.Status = 2
 		ret.Err = err.Error()
 		return ret
 	}
@@ -154,7 +156,8 @@ func getReceiptByTxhash(txhash string, is721 bool) TxStatus {
 	receipt, err := targetClient.TransactionReceipt(context.Background(), _txHash)
 
 	if err != nil {
-		log.Println(err)
+		log.Printf("TransactionReceipt: %s\n", err)
+		ret.Status = 2
 		ret.Err = err.Error()
 		return ret
 	}
@@ -168,7 +171,8 @@ func getReceiptByTxhash(txhash string, is721 bool) TxStatus {
 		contractAbi, err = abi.JSON(strings.NewReader(string(SBTERC721ABI)))
 
 		if err != nil {
-			log.Println(err)
+			log.Printf("abi: %s\n", err)
+			ret.Status = 2
 			ret.Err = err.Error()
 			return ret
 		}
@@ -176,7 +180,7 @@ func getReceiptByTxhash(txhash string, is721 bool) TxStatus {
 		var tokenId = new(big.Int)
 		for _, vLog := range receipt.Logs {
 			// log.Printf("%"vLog)
-			log.Printf("event SigHash:%s %s", vLog.Topics[0].Hex(), logTransferSigHash.Hex())
+			log.Printf("event SigHash:%s %s\n", vLog.Topics[0].Hex(), logTransferSigHash.Hex())
 			switch vLog.Topics[0].Hex() {
 			case logTransferSigHash.Hex():
 				var transferEvent EventTransfer
