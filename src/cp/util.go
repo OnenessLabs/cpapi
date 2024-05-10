@@ -33,7 +33,12 @@ func getAuth(client *ethclient.Client, fromAddress common.Address, privateKey *e
 		return nil, err
 	}
 
-	auth := bind.NewKeyedTransactor(privateKey)
+	chainId := new(big.Int).SetUint64(uint64(123666))
+	auth, err := bind.NewKeyedTransactorWithChainID(privateKey, chainId)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
 	auth.Nonce = big.NewInt(int64(targetNonce))
 	auth.Value = big.NewInt(0) // in wei
 	auth.GasLimit = uint64(0)  // in units
